@@ -42,9 +42,17 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		040A7C3423F75659007B66D2 /* New Group */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = "New Group";
+			sourceTree = "<group>";
+		};
 		04251B4123EC2FAD0045E1FA = {
 			isa = PBXGroup;
 			children = (
+				040A7C3423F75659007B66D2 /* New Group */,
 				04251B4C23EC2FAD0045E1FA /* Computer vision */,
 				04251B4B23EC2FAD0045E1FA /* Products */,
 			);
