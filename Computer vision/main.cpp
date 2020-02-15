@@ -38,8 +38,6 @@ void drawAxes(cv::Mat &pImage, cv::InputArray pCameraMatrix, cv::InputArray pDis
     axisPoints.push_back(Point3f(0, pLength*2, 0));
     axisPoints.push_back(Point3f(0, 0, -pLength*2));
     
-    
-    
     //    project cube;
     vector<Point2f> imagePoints;
     projectPoints(cubePoints, pRvec, pTvec, pCameraMatrix, pDistCoeffs, imagePoints);
@@ -128,7 +126,7 @@ int main() {
             //        using the clock to make steps of .5 seconds;
             
             if(clock() - prevTimeStamp > 500*1e-3*CLOCKS_PER_SEC) {
-                imwrite("./"+to_string(numOfBoards)+"-2/image"+to_string(success)+".jpg", image);
+                imwrite("./"+to_string(numOfBoards)+"-3/image"+to_string(success)+".jpg", image);
                 imagePoints.push_back(corners);
                 objectPoints.push_back(objects);
                 success++;
@@ -154,12 +152,10 @@ int main() {
     //    Calibrate camera;
     calibrateCamera(objectPoints, imagePoints, image.size(), intrinsic, distCoeffs, rvecs, tvecs);
     
-    
+    //    results of the calibration;
     cout << "\n\n intrinsic:-\n" << intrinsic;
     cout << "\n\n distCoeffs:-\n" << distCoeffs;
-    copy(rvecs.begin(), rvecs.end(), ostream_iterator<Mat>(cout, "\n\n Rotation vector:-\n "));
-    copy(tvecs.begin(), tvecs.end(), ostream_iterator<Mat>(cout, "\n\n Translational vector:-\n"));
-    printf("\n\nDone Calibration.........!\n\n");
+    printf("\n\nDone Calibration\n");
     
     Mat imageUndistorted;
 
@@ -168,23 +164,29 @@ int main() {
     int cubed = 0;
     while(1)
     {
+        //        appling the intrinsic matrix to the image;
         undistort(image, imageUndistorted, intrinsic, distCoeffs);
+        
         vector<Point2f> corners;
         vector< Point2f > imagePoints3;
         cvtColor ( image,grayImage, COLOR_BGR2GRAY );
+        //        Finding again the corners of the chessboard;
         bool patternfound = findChessboardCorners(grayImage, boardSize, corners, CALIB_CB_ADAPTIVE_THRESH + CALIB_CB_NORMALIZE_IMAGE + CALIB_CB_FAST_CHECK);
         if(patternfound)
         {
+            //            Improving the corners of the chessboard;
             solvePnP(objects, corners, intrinsic, distCoeffs, Rot, Tran);
+            //            Drawing the axes and the cube;
             drawAxes(imageUndistorted,intrinsic, distCoeffs, Rot, Tran,3*square_size);
         }
         
+        //  Making every .5 seconds a screenshot of the drawn cube;
         if(clock() - prevTimeStamp > 500*1e-3*CLOCKS_PER_SEC) {
             cubed++;
-            imwrite("./"+to_string(numOfBoards)+"-2/image_cubed"+to_string(cubed)+".jpg", imageUndistorted);
+            imwrite("./"+to_string(numOfBoards)+"-3/image_cubed"+to_string(cubed)+".jpg", imageUndistorted);
             prevTimeStamp = clock();
         }
-        
+        //        This shows the webcam feed with the drawn cube in real time;
         imshow("Undistorted Image", imageUndistorted);
         cap >> image;
         if( waitKey(10) == 27 ) break; // stop capturing by pressing ESC
